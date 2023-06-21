@@ -18,14 +18,14 @@ INCLUDE Irvine32.inc
 ;--------------------------------------------------------------------------------------------------
 ;		Name: mGetString
 ;		Description: displays the count of valid numbers, displays the input prompt (either error
-;					  or input prompt), reads input from user, stores the input, stores the bytes read.
+;			     or input prompt), reads input from user, stores the input, stores the bytes read.
 ;		Preconditions: registers saved before macro, values for receives/returns (below) entered in 
-;						correct order during macro call
+;			       correct order during macro call
 ;		Postconditions: registers restored after macro, user input stored in inputAdd array, bytes read
-;						 stored in outputLenAdd
+;				stored in outputLenAdd
 ;		Receives:
 ;			validCounter = address of validCounter		(input by reference)
-;			promptAdd = address of message to display   (input by reference)
+;			promptAdd = address of message to display   	(input by reference)
 ;			inputCount = number of bytes to read		(input by value)
 ;		Returns: 
 ;			inputAdd = address of input/output array	(output by reference)
@@ -38,8 +38,8 @@ mGetString MACRO promptAdd:REQ, inputAdd:REQ, inputCount: REQ, outputLenAdd:REQ,
 		; EXTRA CREDIT ONE - DISPLAY THE COUNTER
 		mov		EBX, [validCounter]
 		mov		EAX, [EBX]
-		push	EAX
-		call	WriteVal
+		push		EAX
+		call		WriteVal
 
 		; DISPLAY THE INPUT PROMPT
 		mov		ESI, [promptAdd]
@@ -48,7 +48,7 @@ mGetString MACRO promptAdd:REQ, inputAdd:REQ, inputCount: REQ, outputLenAdd:REQ,
 		; READ THE USER INPUT
 		mov		EDX, [inputAdd]
 		mov		ECX, inputCount
-		call	ReadString
+		call		ReadString
 		mov		[outputLenAdd], EAX		; save number of entered characters
 
 		; RESTORE REGISTERS AND EXIT (NO STACK CHANGES)
@@ -70,7 +70,7 @@ mDisplayString MACRO stringAddr:REQ
 
 		; WRITE STRING ARRAY TO CONSOLE
 		mov		EDX, stringAddr
-		call	WriteString
+		call		WriteString
 
 		; RESTORE REGISTERS AND EXIT (NO STACK CHANGES)
 		popad
@@ -95,9 +95,9 @@ ENDM
 	getSignFlag			DWORD		0
 	getNumCalc			DWORD		0
 	getString			DWORD		10  DUP(0)
-	getStringLen		DWORD		0
-	getErrorFlag		DWORD		0
-	getStringOutput		SDWORD		0
+	getStringLen			DWORD		0
+	getErrorFlag			DWORD		0
+	getStringOutput			SDWORD		0
 
 	; MAIN VARIABLES
 	validCount			DWORD		0
@@ -105,7 +105,7 @@ ENDM
 	avgVal				SDWORD		0
 	intArray			SDWORD		10  DUP(?)
 	intArrayLen			DWORD		LENGTHOF intArray
-	displayPrompt		BYTE		"You entered the following numbers: ", 10, 13, 0
+	displayPrompt			BYTE		"You entered the following numbers: ", 10, 13, 0
 	resultMsg			BYTE		10, 13, "You have entered the following numbers: ", 10, 13, 0
 	sumMsg				BYTE		10, 13, "The sum of these numbers is: ", 0
 	avgMsg				BYTE		10, 13, "The truncated average is: ", 0
@@ -136,35 +136,35 @@ main PROC
 		; GET 10 VALUES FROM THE USER, CONVERT ASCII TO DEC AND STORE IN AN ARRAY
 		mov		EDI, OFFSET intArray
 		mov		ECX, intArrayLen
-		push	OFFSET validCount
-		push	OFFSET getPrompt
+		push		OFFSET validCount
+		push		OFFSET getPrompt
 		jmp		_continue
 
 _error:
-		push	OFFSET validCount
-		push	OFFSET getErrorMsg		; if error, load error message instead of prompt message
+		push		OFFSET validCount
+		push		OFFSET getErrorMsg		; if error, load error message instead of prompt message
 		mov		getErrorFlag, 0			; reset error flag
 		jmp		_continue
 
 _continue:
-		push	OFFSET getSignFlag
-		push	OFFSET getNumCalc
-		push	OFFSET getErrorFlag
-		push	OFFSET getStringOutput
-		push	OFFSET getString
-		push	OFFSET getStringLen
+		push		OFFSET getSignFlag
+		push		OFFSET getNumCalc
+		push		OFFSET getErrorFlag
+		push		OFFSET getStringOutput
+		push		OFFSET getString
+		push		OFFSET getStringLen
 		mov		getString, 0			; reset getString after each try
 		mov		getSignFlag, 0			; reset signFlag after each try
-		call	ReadVal	
+		call		ReadVal	
 		mov		EAX, getErrorFlag
 		cmp		EAX, 1
-		je		_error					; if there was an entry error
+		je		_error				; if there was an entry error
 		inc		validCount
 		mov		EAX, getStringOutput
-		stosd							; if no error, store the value in the array
-		push	OFFSET validCount
-		push	OFFSET getPrompt
-		loop	_continue
+		stosd						; if no error, store the value in the array
+		push		OFFSET validCount
+		push		OFFSET getPrompt
+		loop		_continue
 		
 		; DISPLAY THE ENTERED NUMBERS WHILE CALCULATING THE SUM
 		mov		ESI, OFFSET resultMsg
@@ -178,37 +178,37 @@ _continue:
 
 _loopIn:
 		lodsd
-		push	EAX
-		call	WriteVal				; print each value
-		cmp		ECX, 1					; print a comma and space between each value except the last item
+		push		EAX
+		call		WriteVal			; print each value
+		cmp		ECX, 1				; print a comma and space between each value except the last item
 		jne		_printComma
 _continuePrint:
-		add		EBX, EAX				; accumulate sum
-		loop	_loopIn
+		add		EBX, EAX			; accumulate sum
+		loop		_loopIn
 		mov		sumVal, EBX
 
 		; CALCULATE THE AVERAGE
 		mov		EAX, sumVal
-		cdq								; sign extend befor idiv
+		cdq						; sign extend befor idiv
 		mov		ECX, intArrayLen
-		idiv	ECX
+		idiv		ECX
 		mov		avgVal, EAX
-		call	CrLf
+		call		CrLf
 
 		; DISPLAY THE RESULTS
 		mov		ESI, OFFSET sumMsg		; print the sum of the array
 		mDisplayString ESI
 
-		push	sumVal
-		call	WriteVal
-		call	CrLf
+		push		sumVal
+		call		WriteVal
+		call		CrLf
 
 		mov		ESI, OFFSET avgMsg		; print the average of the array
 		mDisplayString ESI
 
-		push	avgVal
-		call	WriteVal
-		call	CrLf
+		push		avgVal
+		call		WriteVal
+		call		CrLf
 
 		; GOODBYE
 		mov		ESI, OFFSET goodbyeMsg	; print the goodbye message
@@ -218,14 +218,14 @@ _continuePrint:
 		jmp		endofprogram			; explicit naming for end of program
 
 _printComma:
-		push	ESI
+		push		ESI
 		mov		ESI, OFFSET comma		; print a comma
 		mDisplayString ESI
 		pop		ESI
 		jmp		_continuePrint
 
 endofprogram:
-	Invoke ExitProcess,0				; exit to operating system
+	Invoke ExitProcess,0					; exit to operating system
 
 main ENDP
 
@@ -234,11 +234,11 @@ ReadVal PROC
 ;--------------------------------------------------------------------------------------------------
 ;		Name: ReadVal
 ;		Description: uses mGetString macro to read characters to an input array.  That array will then
-;					  be converted from characters to a signed integer value that fits into an SDWORD.
-;					  Uses error checking to only read +,-,0-9 characters and that the value will fit
-;					  into a SDWORD without overflow.  If an error, will return an error value to main.
+;				be converted from characters to a signed integer value that fits into an SDWORD.
+;				Uses error checking to only read +,-,0-9 characters and that the value will fit
+;				into a SDWORD without overflow.  If an error, will return an error value to main.
 ;		Preconditions: registers saved before the procedure, address offsets for all 'receives' values pushed to 
-;						the stack before procedure call
+;			       the stack before procedure call
 ;		Postconditions: registers restored and stack cleaned up after procedure 
 ;		Receives: 
 ;			getStringLen @ EBP+8 - address offset for the number of characters the user entered during the mGetString macro
@@ -252,7 +252,7 @@ ReadVal PROC
 ;		Returns: converted SDWORD value in getStringOutput (output parameter, by reference) OR getErrorFlag (output parameter,
 ;				  by reference)
 ;---------------------------------------------------------------------------------------------------
-		push	EBP
+		push		EBP
 		mov		EBP, ESP
 		pushad
 
@@ -279,10 +279,10 @@ ReadVal PROC
 _convert:
 		xor		EAX, EAX
 		mov		AL, BYTE PTR [ESI]		; set byte register to read values
-		lodsb							; convert using string primatives
+		lodsb						; convert using string primatives
 
 		cmp		EBX, 0
-		je		_first					; if the first number, check for sign
+		je		_first				; if the first number, check for sign
 
 _continue:
 		cmp		AL, 48
@@ -292,37 +292,37 @@ _continue:
 		sub		AL, 48				
 		mov		[EBP+24], EAX			; convert ASCII to dec
 		mov		EAX, 10
-		mul		EDX						; value of numInt * 10
-		jo		_entryError				; check for overflow
+		mul		EDX				; value of numInt * 10
+		jo		_entryError			; check for overflow
 		mov		EBX, [EBP+24]
-		add		EAX, EBX			    ; value of 10 * numInt + (numChar - 48)
-		jo		_entryError				; check for overflow
-		mov		EDX, EAX				; store result in accumulator
+		add		EAX, EBX			; value of 10 * numInt + (numChar - 48)
+		jo		_entryError			; check for overflow
+		mov		EDX, EAX			; store result in accumulator
 		inc		EBX
-		loop	_convert
+		loop		_convert
 		jmp		_negate
 
 		; CHECK FIRST CHARACTER FOR +/- SIGN
 _first:									
-		cmp  AL, 45						; if - sign
-		je	_setNegative
-		cmp	AL, 43						; if + sign
-		je	_setPositive
-		jmp	_continue
+		cmp  		AL, 45				; if - sign
+		je		_setNegative
+		cmp		AL, 43				; if + sign
+		je		_setPositive
+		jmp		_continue
 
 		; IF + SIGN, MOVE TO NEXT CHARACTER
 _setPositive:
-		inc EBX
-		dec	ECX
-		jmp  _convert
+		inc 		EBX
+		dec		ECX
+		jmp  		_convert
 
 		; IF - SIGN, SET NEGATIVE FLAG AND MOVE TO NEXT CHARACTER
 _setNegative:
-		inc	EBX
-		dec	ECX
-		mov	EAX, 1
-		mov	[EBP+28], EAX
-		jmp	_convert
+		inc		EBX
+		dec		ECX
+		mov		EAX, 1
+		mov		[EBP+28], EAX
+		jmp		_convert
 
 		; IF NEGATIVE FLAG SET, NEGATE TOTAL
 _negate:
@@ -373,15 +373,15 @@ WriteVal PROC
 		xor		ECX, ECX
 		xor		EDX, EDX
 
-		lea		EDI, localString	; set EDI to localString array
-		mov		EAX, [EBP+8]		; load input value
+		lea		EDI, localString		; set EDI to localString array
+		mov		EAX, [EBP+8]			; load input value
 		cmp		EAX, 0
 		jl		_negate
 		jmp		_convertLoop
 
 		; IF A NEGATIVE NUMBER, PRINT - SIGN
 _negate:
-		mov		EAX, [EBP+8]		; load input value and negate
+		mov		EAX, [EBP+8]			; load input value and negate
 		neg		EAX					
 		jmp		_convertLoop
 
@@ -389,18 +389,18 @@ _negate:
 _convertLoop:
 		cdq
 		mov		EBX, 10
-		idiv	EBX
+		idiv		EBX
 		cmp		EAX, 0
 		je		_loadArrayInit
-		push	EDX
+		push		EDX
 		inc		ECX
 		jmp		_convertLoop
 
 		; PUSH LAST VALUE AND CHECK IF MINUS NEEDED
 _loadArrayInit:
-		push	EDX					; save last value from the loop
+		push		EDX				; save last value from the loop
 		inc		ECX
-		mov		EAX, [EBP+8]		; load input value
+		mov		EAX, [EBP+8]			; load input value
 		cmp		EAX, 0
 		jl		_addMinus
 		jmp		_loadArray
@@ -415,7 +415,7 @@ _loadArray:
 		pop		EAX	
 		add		EAX, '0'
 		stosb
-		loop	_loadArray
+		loop		_loadArray
 		mov		EAX, 0				; save trailing zero to indicate end of string
 		stosb
 
